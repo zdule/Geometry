@@ -104,7 +104,7 @@ GameCanvas.prototype.circleCompass = async function()
 	var firstPoint = await this.asyncSelectObject(1);
 	var secondPoint = await this.asyncSelectObject(1);
 	var thirdPoint = await this.asyncSelectObject(1);
-    this.addObject(new Circle(thirdPoint,firstPoint.dist(secondPoint)))
+    this.addObject(new Circle(thirdPoint,firstPoint.dist(secondPoint)));
     this.circleCompass();
 }
 
@@ -147,10 +147,8 @@ GameCanvas.prototype.snapObject = function(x, y, type) {
 
     nearby_pred = (x => x.dist(p) <= MAX_SNAP)
     nearby = this.objects.filter(nearby_pred);
-    console.log(nearby.length);
     options = nearby.filter(x => x.type & this.selectType);
     if (options.length > 0) {
-        console.log("obj");
         return closest(options, p);
     }
 
@@ -238,8 +236,9 @@ GameCanvas.prototype.stateManager =
 	toolbars:['toolbar-point','toolbar-line','toolbar-circle'],
 	hideToolbars: function()
 	{	
-		for(var i = 0;  i < this.toolbarsNum; i++)
-			document.getElementById(this.toolbars[i]).style.display="none";
+		var elems = document.getElementsByClassName("toolbar-aux");
+        for(var i in elems)
+			elems[i].style.display="none";
 	},
 	deselectButtons: function()
 	{

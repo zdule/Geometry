@@ -5,22 +5,26 @@
 	right: 	20px;
 }
 
-.toolbar
+.toolbar, .toolbar-aux
 {
 	margin-top: 20px;
 	background-color: #404040;
 	padding: 10px;
-	padding-top: 0px;
 	border-radius: 10px;
 }
 
 .button
 {
-	margin-top: 10px;
+    display: block;
 	border-radius:10px;
 	border-width: 3px;
 	border-color: #404040;
 	border-style: solid;
+}
+
+.button + .button 
+{
+	margin-top: 10px;
 }
 
 .button-selected
