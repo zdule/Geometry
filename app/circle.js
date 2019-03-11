@@ -23,10 +23,6 @@ Circle.defineThreePoint = function(a,b,c)
 	var l = Line.defineSegmentBisector(a,b);
 	var m = Line.defineSegmentBisector(b,c);
 	var p =l.intersect(m);
-	if (p[0] == -1)
-	{
-		return;
-	}
 	return Circle.defineTwoPoint(p[0],a);
 }
 
@@ -68,7 +64,7 @@ Circle.prototype.intersect = function(obj)
 		return this.intersect(m);
 	}
 	else 
-		return [-1,-1];
+		return [];
 }
 
 Circle.prototype.getClosest = function(p)

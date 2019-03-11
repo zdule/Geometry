@@ -75,7 +75,6 @@ Line.prototype.draw = function(ctx)
 	{
 		ctx.moveTo(0,this.n);
 		ctx.lineTo(2000,2000*this.k+this.n);
-		console.log(0,this.n,2000,2000*this.k+this.n);
 	}
 	ctx.lineWidth = 2;
 	ctx.strokeStyle = '#003300';
@@ -87,13 +86,11 @@ Line.prototype.drawHigh = function(ctx)
 	ctx.beginPath();
 	if (this.x != undefined)
 	{
-		console.log("hi");
 		ctx.moveTo(this.x,0);
 		ctx.lineTo(this.x,2000);
 	}
 	else
 	{
-		console.log("hilo");
 		ctx.moveTo(0,this.n);
 		ctx.lineTo(2000,2000*this.k+this.n);
 	}
@@ -112,14 +109,14 @@ Line.prototype.intersect = function(obj)
 		if (this.x == undefined && obj.x == undefined)
 		{
 			if (this.k==obj.k)
-				return [-1,-1];
+				return [];
 			var c = new Point();
 			c.x = (obj.n-this.n)/(this.k-obj.k);
 			c.y = this.k*c.x+this.n;
-			return [c,-1];
+			return [c];
 		}
 		if (this.x != undefined && obj.x != undefined)
-			return [-1,-1];
+			return [];
 		if (obj.x != undefined)
 			return obj.intersect(this);
 		if (this.x != undefined)
@@ -127,9 +124,9 @@ Line.prototype.intersect = function(obj)
 			var c = new Point();
 			c.x = this.x;
 			c.y = obj.k*this.x+obj.n;
-			return [c,-1];
+			return [c];
 		}
-		return [-1,-1];
+		return [];
 	}
 	else if (obj.type==4)
 	{
@@ -140,20 +137,20 @@ Line.prototype.intersect = function(obj)
 			var c = -obj.r*obj.r+(obj.o.x-this.x)*(obj.o.x-this.x)+obj.o.y*obj.o.y;
 			var w = b*b - 4*a*c;
 			if (w < 0)
-				return [-1,-1];
+				return [];
 			w = Math.sqrt(w); 
 			var y1 = (-b+w)/(2*a);
 			var y2 = (-b-w)/(2*a);
 			if (y1 != y2)
 				return [new Point(this.x,y1),new Point(this.x,y2)];
-			return [new Point(this.x,y1),-1];
+			return [new Point(this.x,y1)];
 		}
 		var a = this.k*this.k+1;
 		var b = -2*obj.o.x +2*this.k*this.n - 2*obj.o.y*this.k;
 		var c = obj.o.x*obj.o.x +this.n*this.n+obj.o.y*obj.o.y-obj.r*obj.r-2*this.n*obj.o.y;
 		var w = b*b-4*a*c;
 		if (w < 0)
-			return [-1,-1];
+			return [];
 		w = Math.sqrt(w);
 		var x1 = (-b+w)/(2*a);
 		var x2 = (-b-w)/(2*a)
@@ -167,10 +164,10 @@ Line.prototype.intersect = function(obj)
 			p2.y = x2*this.k+this.n;
 			return [p1,p2];
 		}
-		return [p1,-1];
+		return [p1];
 	}
 	else
-		return [-1.-1];
+		return [];
 }
 
 Line.prototype.dist = function(p)

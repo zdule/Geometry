@@ -67,5 +67,9 @@ Point.prototype.drawHigh = function(ctx) {
 }
 
 Point.prototype.intersect = function(obj) {
-	return [-1,-1];
+	return [];
+}
+
+Point.prototype.getClosest = function(p) {
+    return new Point(this.x, this.y);
 }
