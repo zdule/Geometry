@@ -10,7 +10,10 @@ function GameCanvas(_canvas_object)
 	this.state = 'none';
 
 	this.canvasObject.addEventListener("mousedown", this, false);
-	this.canvasObject.onmousemove=function(event){window.canvasObj.snapObject(event.clientX, event.clientY, window.canvasObj.selectType)};
+    this.mouseX = 0;
+    this.mouseY = 0;
+    var gc = this;
+	this.canvasObject.onmousemove=function(event){gc.mouseX = event.offsetX; gc.mouseY = event.offsetY;};
 	this.ctx = this.canvasObject.getContext("2d");
 }
 
@@ -140,12 +143,7 @@ function closest(options, p) {
 }
 
 GameCanvas.prototype.snapObject = function(x, y, type) {
-    if (type == 0)
-        return;
-    this.highlighted = undefined;
-
 	var p = new Point(x,y);
-	var min = 10;
 
     nearby_pred = (x => x.dist(p) <= MAX_SNAP)
     nearby = this.objects.filter(nearby_pred);
@@ -153,23 +151,20 @@ GameCanvas.prototype.snapObject = function(x, y, type) {
     options = nearby.filter(x => x.type & this.selectType);
     if (options.length > 0) {
         console.log("obj");
-        this.highlighted = closest(options, p);
-        return;
+        return closest(options, p);
     }
 
 	if (this.selectType != 1) 
-        return;
+        return undefined;
 
     nearby_intersections = getIntersections(nearby).filter(nearby_pred);
     if (nearby_intersections.length > 0) {
-        this.highlighted = closest(nearby_intersections, p);
-        return;
+        return closest(nearby_intersections, p);
     }
 
     nearby_parts = getClosests(nearby,p).filter(nearby_pred);
     if (nearby_parts.length > 0) {
-        this.highlighted = closest(nearby_parts, p);
-        return;
+        return closest(nearby_parts, p);
     }
 }
 
@@ -179,24 +174,22 @@ GameCanvas.prototype.handleEvent = function(event)
 	var y = event.offsetY;
 	var p = new Point(x,y);
     if (this.state == "select") {
-        var obj;
-        if (typeof this.highlighted != 'undefined')
+        var obj = this.snapObject(x,y,this.selectType);
+        if (obj != undefined)
         {
-            obj = this.highlighted;
             if (obj.id == undefined)
                 this.addObject(obj);
         }
-        if (typeof obj == "undefined" && this.selectType==1)
+        if (obj == undefined && this.selectType==1)
         {
             obj = p;
             this.addObject(obj);
         }
-        if (typeof obj == "undefined")
+        if (obj == undefined)
             return;
         this.selectedObject = obj;
         this.selectType = 0;
         this.returnFunc(obj);
-        return;
 	}
 }
 
@@ -204,13 +197,14 @@ GameCanvas.prototype.redraw = function()
 {
 	this.canvasObject.width = window.innerWidth; 
 	this.canvasObject.height = window.innerHeight;
-	if (typeof this.highlighted != 'undefined' && this.highlighted.type > 1)
-		this.highlighted.drawHigh(this.ctx);
+    var highlighted = this.snapObject(this.mouseX, this.mouseY, this.selectType);
+	if (highlighted != undefined && highlighted.type > 1)
+		highlighted.drawHigh(this.ctx);
 	this.objects.sort((a,b) => a.type < b.type);
 	for(var i = 0; i < this.objects.length; i++)
 		this.objects[i].draw(this.ctx);
-	if (typeof this.highlighted != 'undefined' && this.highlighted.type == 1)
-		this.highlighted.drawHigh(this.ctx);
+	if (highlighted != undefined && highlighted.type == 1)
+		highlighted.drawHigh(this.ctx);
 }
 setInterval(function(){window.canvasObj.redraw();},100);
 
