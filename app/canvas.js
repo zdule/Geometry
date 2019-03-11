@@ -1,43 +1,47 @@
-var canvasObj;
+Point = require('./point.js').Point;
+Line = require('./line.js').Line;
+Circle = require('./circle.js').Circle;
+console.log(Circle);
+
 function GameCanvas(_canvas_object)
 {
 	this.canvasObject = _canvas_object;
 	this.objects = new Array();
-	this.objectNum = 0;
 	this.selectType = 0;
-	this.state = 'point';
-	this.idNum = 0;
+	this.state = 'none';
 
 	this.canvasObject.addEventListener("mousedown", this, false);
-	this.canvasObject.onmousemove=function(event){canvasObj.snap(event)};
-	this.canvasObject.width = window.innerWidth;
-	this.canvasObject.height = window.innerHeight;
+	this.canvasObject.onmousemove=function(event){window.canvasObj.snap(event)};
 	this.ctx = this.canvasObject.getContext("2d");
+}
+
+GameCanvas.prototype.removeA = async function() {
+    var obj = await this.asyncSelectObject(7);
+    var ind = this.objects.indexOf(obj);
+
+    if (ind != -1) {
+        this.objects.splice(ind, 1);
+    }
+    this.removeA();
 }
 
 GameCanvas.prototype.remove = function()
 {
-	canvasObj.selectObject(7,
+	this.selectObject(7,
 	function()
 	{
-		var ind = -1;
-		for(var i = 0; i < this.objectNum; i++) 
-		{
-		    if (this.objects[i].id == this.selectedObject.id) {
-		        ind = i;
-		        break;
-		    }
-		}
+		var ind = this.objects.indexOf(this.selectedObject);
 
-		this.objects.splice(ind, 1);
-		this.objectNum--;
-		this.remove();
+        if (ind != -1) {
+            this.objects.splice(ind, 1);
+        }
+        this.remove();
 	}
 	);
 }
 GameCanvas.prototype.Point = function()
 {
-	canvasObj.selectObject(1,
+	this.selectObject(1,
 	function()
 	{
 		this.Point();
@@ -47,7 +51,7 @@ GameCanvas.prototype.Point = function()
 
 GameCanvas.prototype.twoPointLine = function()
 {
-	canvasObj.selectObject(1,
+	this.selectObject(1,
 	function()
 	{
 		this.firstPoint = this.selectedObject; 
@@ -64,7 +68,7 @@ GameCanvas.prototype.twoPointLine = function()
 
 GameCanvas.prototype.middlePoint = function()
 {
-	canvasObj.selectObject(1,
+	this.selectObject(1,
 	function()
 	{
 		this.firstPoint = this.selectedObject; 
@@ -81,7 +85,7 @@ GameCanvas.prototype.middlePoint = function()
 
 GameCanvas.prototype.normalLine = function()
 {
-	canvasObj.selectObject(2,
+	this.selectObject(2,
 	function()
 	{
 		this.firstLine = this.selectedObject; 
@@ -98,7 +102,7 @@ GameCanvas.prototype.normalLine = function()
 
 GameCanvas.prototype.paralelLine = function()
 {
-	canvasObj.selectObject(2,
+	this.selectObject(2,
 	function()
 	{
 		this.firstLine = this.selectedObject; 
@@ -115,7 +119,7 @@ GameCanvas.prototype.paralelLine = function()
 
 GameCanvas.prototype.segmentBisector = function()
 {
-	canvasObj.selectObject(1,
+	this.selectObject(1,
 	function()
 	{
 		this.firstPoint = this.selectedObject; 
@@ -132,7 +136,7 @@ GameCanvas.prototype.segmentBisector = function()
 
 GameCanvas.prototype.angleBisector = function()
 {
-	canvasObj.selectObject(1,
+	this.selectObject(1,
 	function()
 	{
 		this.firstPoint = this.selectedObject; 
@@ -155,7 +159,7 @@ GameCanvas.prototype.angleBisector = function()
 
 GameCanvas.prototype.circleTwoPoint = function()
 {
-	canvasObj.selectObject(1,
+	this.selectObject(1,
 	function()
 	{
 		this.firstPoint = this.selectedObject; 
@@ -172,7 +176,7 @@ GameCanvas.prototype.circleTwoPoint = function()
 
 GameCanvas.prototype.circleThreePoint = function()
 {
-	canvasObj.selectObject(1,
+	this.selectObject(1,
 	function()
 	{
 		this.firstPoint = this.selectedObject; 
@@ -195,7 +199,7 @@ GameCanvas.prototype.circleThreePoint = function()
 
 GameCanvas.prototype.circleCompass = function()
 {
-	canvasObj.selectObject(1,
+	this.selectObject(1,
 	function()
 	{
 		this.firstPoint = this.selectedObject; 
@@ -218,7 +222,7 @@ GameCanvas.prototype.circleCompass = function()
 
 GameCanvas.prototype.intersectObjects = function()
 {
-	canvasObj.selectObject(7,
+	this.selectObject(7,
 	function()
 	{
 		this.firstObject = this.selectedObject; 
@@ -247,7 +251,7 @@ GameCanvas.prototype.snap = function(event)
 	var y = event.clientY;
 	var p = new Point(x,y);
 	var min = 10;
-	for(var i = 0; i < this.objectNum; i++)
+	for(var i = 0; i < this.objects.length; i++)
 	{
 		if (this.objects[i].dist(p) < min && (this.selectType & this.objects[i].type))
 			this.highlighted = this.objects[i];
@@ -256,7 +260,7 @@ GameCanvas.prototype.snap = function(event)
 		return;
 	var first = Line.defineTwoPoints(new Point(1005,1005),new Point(1000,0));
 	var second = Line.defineTwoPoints(new Point(1005,1005),new Point(0,1000));
-	for(var i = 0; i < this.objectNum; i++)
+	for(var i = 0; i < this.objects.length; i++)
 	{
 		if (this.objects[i].dist(p) < first.dist(p) && this.objects[i].type != 1)
 		{
@@ -277,7 +281,7 @@ GameCanvas.prototype.snap = function(event)
 	}
 	if (this.highlighted != undefined)
 		return;
-	for(var i = 0; i < this.objectNum; i++)
+	for(var i = 0; i < this.objects.length; i++)
 	{
 		if (this.objects[i].dist(p) < min && this.objects[i].type != 1)
 		{
@@ -289,15 +293,15 @@ GameCanvas.prototype.snap = function(event)
 
 GameCanvas.prototype.handleEvent = function(event)
 {
-	var x = event.clientX;
-	var y = event.clientY;
+	var x = event.offsetX;
+	var y = event.offsetY;
 	var p = new Point(x,y);
 	switch(this.state)
 	{
 		case 'select':
 			var min = 5.0;
 			var obj;	
-			for(var i = 0; i < this.objectNum; i++)
+			for(var i = 0; i < this.objects.length; i++)
 			{
 				if (this.objects[i].dist(p) < min && this.objects[i].type&this.selectType)
 				{
@@ -320,7 +324,7 @@ GameCanvas.prototype.handleEvent = function(event)
 				break;
 			this.selectedObject = obj;
 			this.selectType = 0;
-			this.returnFunc();
+			this.returnFunc(obj);
 			break;
 	}
 }
@@ -332,12 +336,12 @@ GameCanvas.prototype.redraw = function()
 	if (typeof this.highlighted != 'undefined' && this.highlighted.type > 1)
 		this.highlighted.drawHigh(this.ctx);
 	this.objects.sort(function(a,b){return a.type < b.type});
-	for(var i = 0; i < this.objectNum; i++)
+	for(var i = 0; i < this.objects.length; i++)
 		this.objects[i].draw(this.ctx);
 	if (typeof this.highlighted != 'undefined' && this.highlighted.type == 1)
 		this.highlighted.drawHigh(this.ctx);
 }
-setInterval(function(){canvasObj.redraw();},100);
+setInterval(function(){window.canvasObj.redraw();},100);
 
 GameCanvas.prototype.selectObject = function(type,returnFunc)
 {
@@ -346,10 +350,21 @@ GameCanvas.prototype.selectObject = function(type,returnFunc)
 	this.returnFunc = returnFunc;
 }
 
+GameCanvas.prototype.asyncSelectObject = function(type)
+{
+    var canvas = this
+    return new Promise(function(resolve,reject) {
+        canvas.state = 'select';
+        canvas.selectType = type;
+        canvas.returnFunc = resolve;
+        canvas.reject = reject;
+    });
+}
+
 GameCanvas.prototype.addObject = function(obj)
 {
-	obj.id = this.idNum++;
-	this.objects[this.objectNum++] = obj;
+    obj.id = 7;
+    this.objects.push(obj);
 }
 
 GameCanvas.prototype.stateManager =
@@ -372,21 +387,21 @@ GameCanvas.prototype.stateManager =
 	setPoint: function()
 	{
 		this.selectButton(document.getElementById('button-point'));
-		canvasObj.Point();
+		window.canvasObj.Point();
 		this.hideToolbars();
 		document.getElementById("toolbar-point").style.display="inline-block";
 	},
 	setLine: function()
 	{
 		this.selectButton(document.getElementById('button-two-point-line'));
-		canvasObj.twoPointLine();
+		window.canvasObj.twoPointLine();
 		this.hideToolbars();
 		document.getElementById("toolbar-line").style.display="inline-block";
 	},
 	setCircle: function()
 	{
 		this.selectButton(document.getElementById('button-circle-center-radius'));
-		canvasObj.circleTwoPoint();
+		window.canvasObj.circleTwoPoint();
 		this.hideToolbars();
 		document.getElementById("toolbar-circle").style.display="inline-block";
 	},
@@ -402,8 +417,10 @@ GameCanvas.prototype.stateManager =
 	}
 }
 
+
 function load()
 {
-	canvasObj = new GameCanvas(document.getElementById("canvas"));
-	//canvasObj.addObject(new Line.defineTwoPoints(new Point(5,600),new Point(0,600)));
+	window.canvasObj = new GameCanvas(document.getElementById("canvas"));
 }
+
+module.exports.load = load;

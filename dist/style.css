@@ -1,10 +1,3 @@
-#canvas
-{
-	width: 100%;
-	height: 100%;
-	#background-color: black;
-}
-
 #left-panel
 {
 	position: absolute;
@@ -35,6 +28,14 @@
 	border-color: #0099FF;
 }
 
+html, body, canvas
+{
+    padding: 0px;
+    min-height: 100%;
+    display: block;
+    margin: 0px;
+}
+
 html
 {
 	background-image:
@@ -54,9 +55,4 @@ html
 	inear-gradient(rgba(0,0,0,.05) .062500em, transparent .062500em);
 	background-size: .75em .75em;
 	background-position: 0 -0.5em; 
-}
-
-body
-{
-	margin: 0px;
 }

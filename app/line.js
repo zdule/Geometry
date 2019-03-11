@@ -1,9 +1,13 @@
+Point = require('./point.js').Point;
+
 function Line()
 {
 	this.k = 1;
 	this.n = 0;
 	this.type = 2;
 }
+
+module.exports.Line = Line;
 
 Line.defineTwoPoints = function(a,b)
 {
@@ -18,22 +22,22 @@ Line.defineTwoPoints = function(a,b)
 	return l;
 }
 
-Line.defineLineNormal = function(m,p)
+Line.defineLineNormal = function(line,p)
 {
-	var l = new Line();
-	if (m.x != undefined)
+	var parallel = new Line();
+	if (line.x != undefined)
 	{
-		l.k = 0;
-		l.n = p.y;
+		parallel.k = 0;
+		parallel.n = p.y;
 	}
-	else if (m.k == 0)
-		l.x = p.x;
+	else if (line.k == 0)
+		parallel.x = p.x;
 	else
 	{
-		l.k = -1/m.k;
-		l.n = p.y-l.k*p.x;
+		parallel.k = -1/line.k;
+		parallel.n = p.y-parallel.k*p.x;
 	}
-	return l;
+	return parallel;
 }
 
 Line.defineLineParalel = function(m,p)
@@ -48,29 +52,15 @@ Line.defineSegmentBisector = function(p,q)
 	var l = Line.defineTwoPoints(p,q);
 	return Line.defineLineNormal(l,point);
 }
-Line.defineAngleBisector = function(p,q,r)
-{
-	var a = Math.atan((q.y-p.y)/(q.x-p.x));
-	var b = Math.atan((q.y-r.y)/(q.x-r.x));
-	if ((q.y-p.y)/(q.x-p.x) > 0 && p.y < q.y)
-		a = a+Math.PI;
-	if ((q.y-p.y)/(q.x-p.x) < 0 && p.y > q.y)
-		a = a+Math.PI;
-	if (a > 2*Math.PI)
-		a = a-2*Math.PI;
-	if ((q.y-r.y)/(q.x-r.x) > 0 && r.y < q.y)
-		b = b+Math.PI;
-	if ((q.y-r.y)/(q.x-r.x) < 0 && r.y > q.y)
-		b = b+Math.PI;
-	if (b > 2*Math.PI)
-		b = b-2*Math.PI;
-	var c = (a+b)/2;
-	if (c > 2*Math.PI)
-		c = c-2*Math.PI;
-	var l = new Line();
-	l.k = Math.tan(c);
-	l.n = q.y-l.k*q.x;
-	return l;
+
+Line.defineAngleBisector = function(p,q,r) {
+    var a = q.vectorTo(p).normalize();
+    var b = q.vectorTo(r).normalize();
+    var c = Point.defineMiddle(q.add(a),q.add(b));
+    if (q.dist(c)==0) {
+        return Line.defineLineNormal(Line.defineTwoPoints(p,r),q);
+    }
+    return Line.defineTwoPoints(q,c);
 }
 
 Line.prototype.draw = function(ctx)
@@ -112,11 +102,6 @@ Line.prototype.drawHigh = function(ctx)
 	ctx.stroke();
 }
 
-Line.prototype.dist = function(p)
-{
-	var q = this.getClosest(p);
-	return p.dist(q);
-}
 
 Line.prototype.intersect = function(obj)
 {
@@ -188,8 +173,23 @@ Line.prototype.intersect = function(obj)
 		return [-1.-1];
 }
 
+Line.prototype.dist = function(p)
+{
+	var q = this.getClosest(p);
+	return p.dist(q);
+}
+
 Line.prototype.getClosest = function(p)
 {
 	var l = Line.defineLineNormal(this,p);
 	return  this.intersect(l)[0];
+}
+
+Line.prototype.contains = function(p) {
+    if (this.x != undefined) {
+        return p.x == this.x;
+    }
+    else {
+        return p.x*this.k + this.n == p.y;
+    }
 }

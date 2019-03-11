@@ -1,9 +1,14 @@
+Point = require('./point.js').Point;
+Line = require('./line.js').Line;
+
 function Circle(o,r)
 {
 	this.o = o;
 	this.r = r;
 	this.type = 4;
 }
+
+module.exports.Circle = Circle;
 
 Circle.defineTwoPoint = function(o,p)
 {

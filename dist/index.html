@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" type="text/css" href="style.css">
+        <script src="entry.bundle.js"></script>
+		<title>Geometry constructions</title>
+		<link rel="shortcut icon" href="resources/icon.png"/>
+	</head>
+	<body>
+		<canvas id="canvas"></canvas>
+		<div id="left-panel">
+			<div class="toolbar" id="toolbar-main">
+				<img src="resources/points.png" class="button" onclick="canvasObj.stateManager.setPoint();" />
+				<br/>
+				<img src="resources/line.png" class="button" onclick="canvasObj.stateManager.setLine();" />
+				<br/>
+				<img src="resources/circleCenterPoint.png" class="button" onclick="canvasObj.stateManager.setCircle();" />
+				<br/>
+				<img src="resources/erase.png" class="button" onclick="canvasObj.removeA(); canvasObj.stateManager.selectButton(this); canvasObj.stateManager.setMain();" />
+			</div>
+
+			<div class="toolbar" id="toolbar-point" style="display: none;">
+				<img src="resources/points.png" id="button-point" class="button" onclick="canvasObj.Point(); canvasObj.stateManager.selectButton(this);" />
+				<br/>
+				<img src="resources/middle.png" id="button-middle-point" class="button" onclick="canvasObj.middlePoint(); canvasObj.stateManager.selectButton(this);" />
+				<br/>
+				<img src="resources/intersection.png" id="button-intersection-point" class="button" onclick="canvasObj.intersectObjects(); canvasObj.stateManager.selectButton(this);" />
+			</div>
+
+			<div class="toolbar" id="toolbar-line" style="display:none;">
+				<img src="resources/line.png" id="button-two-point-line" class="button" onclick="canvasObj.twoPointLine(); canvasObj.stateManager.selectButton(this);" />
+				<br/>
+				<img src="resources/normal.png" class="button" onclick="canvasObj.normalLine(); canvasObj.stateManager.selectButton(this);" />
+				<br/>
+				<img src="resources/paralel.png" class="button" onclick="canvasObj.paralelLine(); canvasObj.stateManager.selectButton(this);" />
+				<br/>
+				<img src="resources/segment-bisector.png" class="button" onclick="canvasObj.segmentBisector(); canvasObj.stateManager.selectButton(this);" />
+				<br/>
+				<img src="resources/angle-bisector.png" class="button" onclick="canvasObj.angleBisector(); canvasObj.stateManager.selectButton(this);" />
+			</div>
+
+			<div class="toolbar" id="toolbar-circle" style="display: none;">
+				<img src="resources/circleCenterPoint.png" id="button-circle-center-radius" class="button" onclick="canvasObj.circleTwoPoint(); canvasObj.stateManager.selectButton(this);" />
+				<br/>
+				<img src="resources/circle-three-point.png" class="button" onclick="canvasObj.circleThreePoint(); canvasObj.stateManager.selectButton(this);" />
+				<br/>
+				<img src="resources/compass.png" class="button" onclick="canvasObj.circleCompass(); canvasObj.stateManager.selectButton(this);" />
+			</div>
+		</div>
+
+		<script>
+			Controller.load();
+            canvasObj = window.canvasObj;
+		</script>
+	</body>
+</html>
