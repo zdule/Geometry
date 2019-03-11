@@ -1,6 +1,7 @@
 Point = require('./point.js').Point;
 Line = require('./line.js').Line;
 Circle = require('./circle.js').Circle;
+ToolbarController = require('./toolbar_controller.js').ToolbarController;
 
 function GameCanvas(_canvas_object)
 {
@@ -27,18 +28,10 @@ GameCanvas.prototype.remove = async function() {
     this.remove();
 }
 
-GameCanvas.prototype.Point = async function()
+GameCanvas.prototype.point = async function()
 {
     await this.asyncSelectObject(1);
-    this.Point();
-}
-
-GameCanvas.prototype.twoPointLine = async function()
-{
-	var firstPoint = await this.asyncSelectObject(1);
-	var secondPoint = await this.asyncSelectObject(1);
-    this.addObject(Line.defineTwoPoints(firstPoint,secondPoint));
-    this.twoPointLine();
+    this.point();
 }
 
 GameCanvas.prototype.middlePoint = async function()
@@ -47,6 +40,14 @@ GameCanvas.prototype.middlePoint = async function()
 	var secondPoint = await this.asyncSelectObject(1);
     this.addObject(Point.defineMiddle(firstPoint,secondPoint));
     this.middlePoint();
+}
+
+GameCanvas.prototype.twoPointLine = async function()
+{
+	var firstPoint = await this.asyncSelectObject(1);
+	var secondPoint = await this.asyncSelectObject(1);
+    this.addObject(Line.defineTwoPoints(firstPoint,secondPoint));
+    this.twoPointLine();
 }
 
 GameCanvas.prototype.normalLine = async function()
@@ -230,61 +231,10 @@ GameCanvas.prototype.addObject = function(obj)
     this.objects.push(obj);
 }
 
-GameCanvas.prototype.stateManager =
-{
-	toolbarsNum:3,
-	toolbars:['toolbar-point','toolbar-line','toolbar-circle'],
-	hideToolbars: function()
-	{	
-		var elems = document.getElementsByClassName("toolbar-aux");
-        for(var i in elems)
-			elems[i].style.display="none";
-	},
-	deselectButtons: function()
-	{
-		var elems = document.getElementsByClassName("button");
-		for(var i = 0; i < elems.length; i++)
-		{
-		  elems[i].className = elems[i].className.replace( /(?:^|\s)button-selected(?!\S)/g , '' );
-		}
-	},
-	setPoint: function()
-	{
-		this.selectButton(document.getElementById('button-point'));
-		window.canvasObj.Point();
-		this.hideToolbars();
-		document.getElementById("toolbar-point").style.display="inline-block";
-	},
-	setLine: function()
-	{
-		this.selectButton(document.getElementById('button-two-point-line'));
-		window.canvasObj.twoPointLine();
-		this.hideToolbars();
-		document.getElementById("toolbar-line").style.display="inline-block";
-	},
-	setCircle: function()
-	{
-		this.selectButton(document.getElementById('button-circle-center-radius'));
-		window.canvasObj.circleTwoPoint();
-		this.hideToolbars();
-		document.getElementById("toolbar-circle").style.display="inline-block";
-	},
-	setMain: function()
-	{
-		this.state = "none";
-		this.hideToolbars();
-	},
-	selectButton : function(obj)
-	{
-		this.deselectButtons();
-		obj.className += ' button-selected';
-	}
-}
-
-
 function load()
 {
 	window.canvasObj = new GameCanvas(document.getElementById("canvas"));
+    window.toolbarController = new ToolbarController(window.canvasObj);
 }
 
 module.exports.load = load;

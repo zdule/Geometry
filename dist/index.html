@@ -11,30 +11,30 @@
 		<canvas id="canvas"></canvas>
 		<div id="left-panel">
 			<div class="toolbar" id="toolbar-main">
-				<img src="resources/points.png" class="button" data-show-toolbar="point" onclick="canvasObj.stateManager.setPoint();" />
-				<img src="resources/line.png" class="button" data-show-toolbar="line" onclick="canvasObj.stateManager.setLine();" />
-				<img src="resources/circleCenterPoint.png" class="button" data-show-toolbar="circle" onclick="canvasObj.stateManager.setCircle();" />
-				<img src="resources/erase.png" class="button" data-show-toolbar="none" onclick="canvasObj.remove(); canvasObj.stateManager.selectButton(this); canvasObj.stateManager.setMain();" />
+				<img src="resources/points.png" class="button" data-showtoolbar="toolbar-point" />
+				<img src="resources/line.png" class="button" data-showtoolbar="toolbar-line" />
+				<img src="resources/circleCenterPoint.png" class="button" data-showtoolbar="toolbar-circle" />
+				<img src="resources/erase.png" class="button" data-actionremove />
 			</div>
 
 			<div class="toolbar-aux" id="toolbar-point" style="display: none;">
-				<img src="resources/points.png" id="button-point" class="button" onclick="canvasObj.Point(); canvasObj.stateManager.selectButton(this);" />
-				<img src="resources/middle.png" id="button-middle-point" class="button" onclick="canvasObj.middlePoint(); canvasObj.stateManager.selectButton(this);" />
-				<img src="resources/intersection.png" id="button-intersection-point" class="button" onclick="canvasObj.intersectObjects(); canvasObj.stateManager.selectButton(this);" />
+				<img src="resources/points.png" id="button-point" class="button" data-action="point" />
+				<img src="resources/middle.png" id="button-middle-point" class="button" data-action="middlePoint" />
+				<img src="resources/intersection.png" id="button-intersection-point" class="button" data-action="intersectObjects" />
 			</div>
 
 			<div class="toolbar-aux" id="toolbar-line" style="display:none;">
-				<img src="resources/line.png" id="button-two-point-line" class="button" onclick="canvasObj.twoPointLine(); canvasObj.stateManager.selectButton(this);" />
-				<img src="resources/normal.png" class="button" onclick="canvasObj.normalLine(); canvasObj.stateManager.selectButton(this);" />
-				<img src="resources/paralel.png" class="button" onclick="canvasObj.paralelLine(); canvasObj.stateManager.selectButton(this);" />
-				<img src="resources/segment-bisector.png" class="button" onclick="canvasObj.segmentBisector(); canvasObj.stateManager.selectButton(this);" />
-				<img src="resources/angle-bisector.png" class="button" onclick="canvasObj.angleBisector(); canvasObj.stateManager.selectButton(this);" />
+				<img src="resources/line.png" id="button-two-point-line" class="button" data-action="twoPointLine" />
+				<img src="resources/normal.png" class="button" data-action="normalLine" />
+				<img src="resources/paralel.png" class="button" data-action="paralelLine" />
+				<img src="resources/segment-bisector.png" class="button" data-action="segmentBisector" />
+				<img src="resources/angle-bisector.png" class="button" data-action="angleBisector" />
 			</div>
 
 			<div class="toolbar-aux" id="toolbar-circle" style="display: none;">
-				<img src="resources/circleCenterPoint.png" id="button-circle-center-radius" class="button" onclick="canvasObj.circleTwoPoint(); canvasObj.stateManager.selectButton(this);" />
-				<img src="resources/circle-three-point.png" class="button" onclick="canvasObj.circleThreePoint(); canvasObj.stateManager.selectButton(this);" />
-				<img src="resources/compass.png" class="button" onclick="canvasObj.circleCompass(); canvasObj.stateManager.selectButton(this);" />
+				<img src="resources/circleCenterPoint.png" id="button-circle-center-radius" class="button" data-action="circleTwoPoint" />
+				<img src="resources/circle-three-point.png" class="button" data-action="circleThreePoint" />
+				<img src="resources/compass.png" class="button" data-action="circleCompass" />
 			</div>
 		</div>
 
