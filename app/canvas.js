@@ -49,68 +49,20 @@ GameCanvas.prototype.point = async function() {
 }
 
 GameCanvas.prototype.middlePoint = genericAddObjects([1,1],Point.defineMiddle);
-/*
-GameCanvas.prototype.middlePoint = async function() {
-	var firstPoint = await this.asyncSelectObject(1);
-	var secondPoint = await this.asyncSelectObject(1);
-    this.addObject(Point.defineMiddle(firstPoint,secondPoint));
-    this.middlePoint();
-}
-*/
 
 GameCanvas.prototype.twoPointLine = genericAddObjects([1,1],Line.defineTwoPoints);
-/*
-GameCanvas.prototype.twoPointLine = async function() {
-	var firstPoint = await this.asyncSelectObject(1);
-	var secondPoint = await this.asyncSelectObject(1);
-    this.addObject(Line.defineTwoPoints(firstPoint,secondPoint));
-    this.twoPointLine();
-}
-*/
 
-GameCanvas.prototype.normalLine = async function() {
-	var line = await this.asyncSelectObject(2);
-	var point = await this.asyncSelectObject(1);
-    this.addObject(Line.defineLineNormal(line,point));
-    this.normalLine();
-}
+GameCanvas.prototype.normalLine = genericAddObjects([2,1],Line.defineLineNormal);
 
-GameCanvas.prototype.paralelLine = async function() {
-	var line = await this.asyncSelectObject(2);
-	var point = await this.asyncSelectObject(1);
-    this.addObject(Line.defineLineParalel(line,point));
-    this.paralelLine();
-}
+GameCanvas.prototype.paralelLine = genericAddObjects([2,1],Line.defineLineParalel);
 
-GameCanvas.prototype.segmentBisector = async function() {
-	var firstPoint = await this.asyncSelectObject(1);
-	var secondPoint = await this.asyncSelectObject(1);
-    this.addObject(Line.defineSegmentBisector(firstPoint,secondPoint));
-    this.segmentBisector();
-}
+GameCanvas.prototype.segmentBisector = genericAddObjects([1,1],Line.defineSegmentBisector);
 
-GameCanvas.prototype.angleBisector = async function() {
-	var firstPoint = await this.asyncSelectObject(1);
-	var secondPoint = await this.asyncSelectObject(1);
-	var thirdPoint = await this.asyncSelectObject(1);
-    this.addObject(Line.defineAngleBisector(firstPoint,secondPoint,thirdPoint))
-    this.angleBisector();
-}
+GameCanvas.prototype.angleBisector = genericAddObjects([1,1,1],Line.defineAngleBisector);
 
-GameCanvas.prototype.circleTwoPoint = async function() {
-	var firstPoint = await this.asyncSelectObject(1);
-	var secondPoint = await this.asyncSelectObject(1);
-    this.addObject(Circle.defineTwoPoint(firstPoint,secondPoint));
-    this.circleTwoPoint();
-}
+GameCanvas.prototype.circleTwoPoint = genericAddObjects([1,1],Circle.defineTwoPoint);
 
-GameCanvas.prototype.circleThreePoint = async function() {
-	var firstPoint = await this.asyncSelectObject(1);
-	var secondPoint = await this.asyncSelectObject(1);
-	var thirdPoint = await this.asyncSelectObject(1);
-    this.addObject(Circle.defineThreePoint(firstPoint,secondPoint,thirdPoint));
-    this.circleThreePoint();
-}
+GameCanvas.prototype.circleThreePoint = genericAddObjects([1,1,1],Circle.defineThreePoint);
 
 GameCanvas.prototype.circleCompass = async function() {
 	var firstPoint = await this.asyncSelectObject(1);
