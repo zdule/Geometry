@@ -3,7 +3,7 @@ var webpack = require('webpack');
 
 module.exports = {
     entry: {
-        entry: __dirname + '/app/canvas.js'
+        entry: __dirname + '/app/game.js'
     },
     output: {
         filename: '[name].bundle.js',
