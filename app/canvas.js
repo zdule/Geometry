@@ -3,12 +3,10 @@ Line = require('./line.js').Line;
 Circle = require('./circle.js').Circle;
 ToolbarController = require('./toolbar_controller.js').ToolbarController;
 
-function GameCanvas(_canvas_object)
-{
+function GameCanvas(_canvas_object) {
 	this.canvasObject = _canvas_object;
 	this.objects = new Array();
 	this.selectType = 0;
-	this.state = 'none';
 
 	this.canvasObject.addEventListener("mousedown", this, false);
     this.mouseX = 0;
@@ -28,54 +26,70 @@ GameCanvas.prototype.remove = async function() {
     this.remove();
 }
 
-GameCanvas.prototype.point = async function()
-{
+function genericAddObjects(types, fun) {
+    return async function() {
+        while(true) {
+            var args = [];
+            for(var t of types) {
+                args.push(await this.asyncSelectObject(t));
+            } 
+            var ret = fun(...args);
+            if (!Array.isArray(ret))
+                ret = [ret];
+            for (var obj of ret) {
+                this.addObject(obj);
+            }
+        }
+    };
+}
+
+GameCanvas.prototype.point = async function() {
     await this.asyncSelectObject(1);
     this.point();
 }
 
-GameCanvas.prototype.middlePoint = async function()
-{
+GameCanvas.prototype.middlePoint = genericAddObjects([1,1],Point.defineMiddle);
+/*
+GameCanvas.prototype.middlePoint = async function() {
 	var firstPoint = await this.asyncSelectObject(1);
 	var secondPoint = await this.asyncSelectObject(1);
     this.addObject(Point.defineMiddle(firstPoint,secondPoint));
     this.middlePoint();
 }
+*/
 
-GameCanvas.prototype.twoPointLine = async function()
-{
+GameCanvas.prototype.twoPointLine = genericAddObjects([1,1],Line.defineTwoPoints);
+/*
+GameCanvas.prototype.twoPointLine = async function() {
 	var firstPoint = await this.asyncSelectObject(1);
 	var secondPoint = await this.asyncSelectObject(1);
     this.addObject(Line.defineTwoPoints(firstPoint,secondPoint));
     this.twoPointLine();
 }
+*/
 
-GameCanvas.prototype.normalLine = async function()
-{
+GameCanvas.prototype.normalLine = async function() {
 	var line = await this.asyncSelectObject(2);
 	var point = await this.asyncSelectObject(1);
     this.addObject(Line.defineLineNormal(line,point));
     this.normalLine();
 }
 
-GameCanvas.prototype.paralelLine = async function()
-{
+GameCanvas.prototype.paralelLine = async function() {
 	var line = await this.asyncSelectObject(2);
 	var point = await this.asyncSelectObject(1);
     this.addObject(Line.defineLineParalel(line,point));
     this.paralelLine();
 }
 
-GameCanvas.prototype.segmentBisector = async function()
-{
+GameCanvas.prototype.segmentBisector = async function() {
 	var firstPoint = await this.asyncSelectObject(1);
 	var secondPoint = await this.asyncSelectObject(1);
     this.addObject(Line.defineSegmentBisector(firstPoint,secondPoint));
     this.segmentBisector();
 }
 
-GameCanvas.prototype.angleBisector = async function()
-{
+GameCanvas.prototype.angleBisector = async function() {
 	var firstPoint = await this.asyncSelectObject(1);
 	var secondPoint = await this.asyncSelectObject(1);
 	var thirdPoint = await this.asyncSelectObject(1);
@@ -83,16 +97,14 @@ GameCanvas.prototype.angleBisector = async function()
     this.angleBisector();
 }
 
-GameCanvas.prototype.circleTwoPoint = async function()
-{
+GameCanvas.prototype.circleTwoPoint = async function() {
 	var firstPoint = await this.asyncSelectObject(1);
 	var secondPoint = await this.asyncSelectObject(1);
     this.addObject(Circle.defineTwoPoint(firstPoint,secondPoint));
     this.circleTwoPoint();
 }
 
-GameCanvas.prototype.circleThreePoint = async function()
-{
+GameCanvas.prototype.circleThreePoint = async function() {
 	var firstPoint = await this.asyncSelectObject(1);
 	var secondPoint = await this.asyncSelectObject(1);
 	var thirdPoint = await this.asyncSelectObject(1);
@@ -100,8 +112,7 @@ GameCanvas.prototype.circleThreePoint = async function()
     this.circleThreePoint();
 }
 
-GameCanvas.prototype.circleCompass = async function()
-{
+GameCanvas.prototype.circleCompass = async function() {
 	var firstPoint = await this.asyncSelectObject(1);
 	var secondPoint = await this.asyncSelectObject(1);
 	var thirdPoint = await this.asyncSelectObject(1);
@@ -109,8 +120,7 @@ GameCanvas.prototype.circleCompass = async function()
     this.circleCompass();
 }
 
-GameCanvas.prototype.intersectObjects = async function()
-{
+GameCanvas.prototype.intersectObjects = async function() {
 	var o1 = await this.asyncSelectObject(7);
 	var o2 = await this.asyncSelectObject(7);
     var w = o1.intersect(o2);
@@ -172,28 +182,25 @@ GameCanvas.prototype.handleEvent = function(event)
 	var x = event.offsetX;
 	var y = event.offsetY;
 	var p = new Point(x,y);
-    if (this.state == "select") {
+    if (this.selectType != 0) {
         var obj = this.snapObject(x,y,this.selectType);
-        if (obj != undefined)
-        {
-            if (obj.id == undefined)
+        if (obj != undefined) {
+            if (!this.objects.includes(obj))
                 this.addObject(obj);
         }
-        if (obj == undefined && this.selectType==1)
-        {
+        if (obj == undefined && this.selectType==1) {
             obj = p;
             this.addObject(obj);
         }
         if (obj == undefined)
             return;
-        this.selectedObject = obj;
+        console.log(obj.type);
         this.selectType = 0;
         this.returnFunc(obj);
 	}
 }
 
-GameCanvas.prototype.redraw = function()
-{
+GameCanvas.prototype.redraw = function() {
 	this.canvasObject.width = window.innerWidth; 
 	this.canvasObject.height = window.innerHeight;
     var highlighted = this.snapObject(this.mouseX, this.mouseY, this.selectType);
@@ -205,34 +212,23 @@ GameCanvas.prototype.redraw = function()
 	if (highlighted != undefined && highlighted.type == 1)
 		highlighted.drawHigh(this.ctx);
 }
+
 setInterval(function(){window.canvasObj.redraw();},100);
 
-GameCanvas.prototype.selectObject = function(type,returnFunc)
-{
-	this.state = 'select';
-	this.selectType = type;
-	this.returnFunc = returnFunc;
-}
-
-GameCanvas.prototype.asyncSelectObject = function(type)
-{
+GameCanvas.prototype.asyncSelectObject = function(type) {
     var canvas = this
     return new Promise(function(resolve,reject) {
-        canvas.state = 'select';
         canvas.selectType = type;
         canvas.returnFunc = resolve;
         canvas.reject = reject;
     });
 }
 
-GameCanvas.prototype.addObject = function(obj)
-{
-    obj.id = 7;
+GameCanvas.prototype.addObject = function(obj) {
     this.objects.push(obj);
 }
 
-function load()
-{
+function load() {
 	window.canvasObj = new GameCanvas(document.getElementById("canvas"));
     window.toolbarController = new ToolbarController(window.canvasObj);
 }
