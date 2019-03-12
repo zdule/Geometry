@@ -2,10 +2,13 @@ Point = require('./point.js').Point;
 Line = require('./line.js').Line;
 Circle = require('./circle.js').Circle;
 ToolbarController = require('./toolbar_controller.js').ToolbarController;
+ObjectSelection = require('./object_selection.js');
+var selectObject = ObjectSelection.selectObject;
+var getHighlighted = ObjectSelection.getHighlighted;
 
 function GameCanvas(_canvas_object) {
 	this.canvasObject = _canvas_object;
-	this.objects = new Array();
+	this.objects = [];
 	this.selectType = 0;
 
 	this.canvasObject.addEventListener("mousedown", this, false);
@@ -82,80 +85,30 @@ GameCanvas.prototype.intersectObjects = async function() {
     this.intersectObjects();
 }
 
-MAX_SNAP = 10;
-function argmin(arr, map, init) {
-    return arr.map(map).reduce((min,cur) => cur[0] < min[0] ? cur : min, init)[1];
-}
-
-function getIntersections(arr) {
-    sol = []
-    for(i in arr) {
-        for(j in arr) {
-            sol = sol.concat(arr[i].intersect(arr[j]));
-        }
-    }
-    return sol;
-}
-
-function getClosests(arr, p) {
-    return arr.map(x => x.getClosest(p)); 
-}
-
-function closest(options, p) {
-    return argmin(options, x => [x.dist(p),x], [100,undefined]);
-}
-
-GameCanvas.prototype.snapObject = function(x, y, type) {
-	var p = new Point(x,y);
-
-    nearby_pred = (x => x.dist(p) <= MAX_SNAP)
-    nearby = this.objects.filter(nearby_pred);
-    options = nearby.filter(x => x.type & this.selectType);
-    if (options.length > 0) {
-        return closest(options, p);
-    }
-
-	if (this.selectType != 1) 
-        return undefined;
-
-    nearby_intersections = getIntersections(nearby).filter(nearby_pred);
-    if (nearby_intersections.length > 0) {
-        return closest(nearby_intersections, p);
-    }
-
-    nearby_parts = getClosests(nearby,p).filter(nearby_pred);
-    if (nearby_parts.length > 0) {
-        return closest(nearby_parts, p);
-    }
-}
-
 GameCanvas.prototype.handleEvent = function(event)
 {
+    if (this.selectType == 0) 
+        return;
 	var x = event.offsetX;
 	var y = event.offsetY;
 	var p = new Point(x,y);
-    if (this.selectType != 0) {
-        var obj = this.snapObject(x,y,this.selectType);
-        if (obj != undefined) {
-            if (!this.objects.includes(obj))
-                this.addObject(obj);
-        }
-        if (obj == undefined && this.selectType==1) {
-            obj = p;
+    var obj = selectObject(p, this.objects, this.selectType);
+    if (obj != undefined) {
+        if (!this.objects.includes(obj))
             this.addObject(obj);
-        }
-        if (obj == undefined)
-            return;
-        console.log(obj.type);
-        this.selectType = 0;
-        this.returnFunc(obj);
-	}
+    }
+    if (obj == undefined)
+        return;
+    this.selectType = 0;
+    this.returnFunc(obj);
 }
+
 
 GameCanvas.prototype.redraw = function() {
 	this.canvasObject.width = window.innerWidth; 
 	this.canvasObject.height = window.innerHeight;
-    var highlighted = this.snapObject(this.mouseX, this.mouseY, this.selectType);
+    var highlighted = getHighlighted(new Point(this.mouseX, this.mouseY),
+                                     this.objects, this.selectType);
 	if (highlighted != undefined && highlighted.type > 1)
 		highlighted.drawHigh(this.ctx);
 	this.objects.sort((a,b) => a.type < b.type);
