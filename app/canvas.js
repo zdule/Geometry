@@ -6,20 +6,20 @@ ObjectSelection = require('./object_selection.js');
 var selectObject = ObjectSelection.selectObject;
 var getHighlighted = ObjectSelection.getHighlighted;
 
-function GameCanvas(_canvas_object) {
-	this.canvasObject = _canvas_object;
+function GameController(canvasElement) {
+	this.canvasElement = canvasElement;
 	this.objects = [];
 	this.selectType = 0;
 
-	this.canvasObject.addEventListener("mousedown", this, false);
+	this.canvasElement.addEventListener("mousedown", this, false);
     this.mouseX = 0;
     this.mouseY = 0;
     var gc = this;
-	this.canvasObject.onmousemove=function(event){gc.mouseX = event.offsetX; gc.mouseY = event.offsetY;};
-	this.ctx = this.canvasObject.getContext("2d");
+	this.canvasElement.onmousemove=function(event){gc.mouseX = event.offsetX; gc.mouseY = event.offsetY;};
+	this.ctx = this.canvasElement.getContext("2d");
 }
 
-GameCanvas.prototype.remove = async function() {
+GameController.prototype.remove = async function() {
     var obj = await this.asyncSelectObject(7);
     var ind = this.objects.indexOf(obj);
 
@@ -46,28 +46,28 @@ function genericAddObjects(types, fun) {
     };
 }
 
-GameCanvas.prototype.point = async function() {
+GameController.prototype.point = async function() {
     await this.asyncSelectObject(1);
     this.point();
 }
 
-GameCanvas.prototype.middlePoint = genericAddObjects([1,1],Point.defineMiddle);
+GameController.prototype.middlePoint = genericAddObjects([1,1],Point.defineMiddle);
 
-GameCanvas.prototype.twoPointLine = genericAddObjects([1,1],Line.defineTwoPoints);
+GameController.prototype.twoPointLine = genericAddObjects([1,1],Line.defineTwoPoints);
 
-GameCanvas.prototype.normalLine = genericAddObjects([2,1],Line.defineLineNormal);
+GameController.prototype.normalLine = genericAddObjects([2,1],Line.defineLineNormal);
 
-GameCanvas.prototype.paralelLine = genericAddObjects([2,1],Line.defineLineParalel);
+GameController.prototype.paralelLine = genericAddObjects([2,1],Line.defineLineParalel);
 
-GameCanvas.prototype.segmentBisector = genericAddObjects([1,1],Line.defineSegmentBisector);
+GameController.prototype.segmentBisector = genericAddObjects([1,1],Line.defineSegmentBisector);
 
-GameCanvas.prototype.angleBisector = genericAddObjects([1,1,1],Line.defineAngleBisector);
+GameController.prototype.angleBisector = genericAddObjects([1,1,1],Line.defineAngleBisector);
 
-GameCanvas.prototype.circleTwoPoint = genericAddObjects([1,1],Circle.defineTwoPoint);
+GameController.prototype.circleTwoPoint = genericAddObjects([1,1],Circle.defineTwoPoint);
 
-GameCanvas.prototype.circleThreePoint = genericAddObjects([1,1,1],Circle.defineThreePoint);
+GameController.prototype.circleThreePoint = genericAddObjects([1,1,1],Circle.defineThreePoint);
 
-GameCanvas.prototype.circleCompass = async function() {
+GameController.prototype.circleCompass = async function() {
 	var firstPoint = await this.asyncSelectObject(1);
 	var secondPoint = await this.asyncSelectObject(1);
 	var thirdPoint = await this.asyncSelectObject(1);
@@ -75,7 +75,7 @@ GameCanvas.prototype.circleCompass = async function() {
     this.circleCompass();
 }
 
-GameCanvas.prototype.intersectObjects = async function() {
+GameController.prototype.intersectObjects = async function() {
 	var o1 = await this.asyncSelectObject(7);
 	var o2 = await this.asyncSelectObject(7);
     var w = o1.intersect(o2);
@@ -85,7 +85,7 @@ GameCanvas.prototype.intersectObjects = async function() {
     this.intersectObjects();
 }
 
-GameCanvas.prototype.handleEvent = function(event)
+GameController.prototype.handleEvent = function(event)
 {
     if (this.selectType == 0) 
         return;
@@ -104,9 +104,9 @@ GameCanvas.prototype.handleEvent = function(event)
 }
 
 
-GameCanvas.prototype.redraw = function() {
-	this.canvasObject.width = window.innerWidth; 
-	this.canvasObject.height = window.innerHeight;
+GameController.prototype.redraw = function() {
+	this.canvasElement.width = window.innerWidth; 
+	this.canvasElement.height = window.innerHeight;
     var highlighted = getHighlighted(new Point(this.mouseX, this.mouseY),
                                      this.objects, this.selectType);
 	if (highlighted != undefined && highlighted.type > 1)
@@ -118,24 +118,23 @@ GameCanvas.prototype.redraw = function() {
 		highlighted.drawHigh(this.ctx);
 }
 
-setInterval(function(){window.canvasObj.redraw();},100);
-
-GameCanvas.prototype.asyncSelectObject = function(type) {
-    var canvas = this
+GameController.prototype.asyncSelectObject = function(type) {
+    var game = this
     return new Promise(function(resolve,reject) {
-        canvas.selectType = type;
-        canvas.returnFunc = resolve;
-        canvas.reject = reject;
+        game.selectType = type;
+        game.returnFunc = resolve;
+        game.reject = reject;
     });
 }
 
-GameCanvas.prototype.addObject = function(obj) {
+GameController.prototype.addObject = function(obj) {
     this.objects.push(obj);
 }
 
 function load() {
-	window.canvasObj = new GameCanvas(document.getElementById("canvas"));
-    window.toolbarController = new ToolbarController(window.canvasObj);
+	toolbarController = new GameController(document.getElementById("canvas"));
+    new ToolbarController(toolbarController);
+    setInterval(() => toolbarController.redraw(),100);
 }
 
 module.exports.load = load;
